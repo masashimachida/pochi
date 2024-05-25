@@ -4,7 +4,9 @@
   "description": "Your pet on Bluesky, Pochi.",
   "main": "dist/main.js",
   "scripts": {
-    "start": "forever -a -l ./logs/app.log -o ./logs/stdout.log -e ./logs/stderr.log ./dist/main.js",
+    "start": "forever start --minUptime 1000 --spinSleepTime 1000 -p . -a -l ./logs/app.log -o ./logs/stdout.log -e ./logs/stderr.log ./dist/main.js",
+    "stop": "forever stop ./dist/main.js",
+    "restart": "forever restart ./dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
