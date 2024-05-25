@@ -34,22 +34,22 @@ client.on('message', (m) => __awaiter(void 0, void 0, void 0, function* () {
     const car = yield readCar(m.blocks);
     m.ops.forEach((op) => {
         var _a, _b, _c, _d;
-        if (op.path.match(/^app.bsky.feed.post/) && op.action === "create") {
-            if (!op.cid)
-                return;
-            const recordBlocks = car.blocks.get(op.cid);
-            if (!recordBlocks)
-                return;
-            const record = cborToLexRecord(recordBlocks);
-            if (record.text.match(new RegExp("\@" + POCHI_USERNAME))) {
-                reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
-            }
-            else if (((_b = (_a = record.reply) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.uri) && record.reply.parent.uri.match(new RegExp('^at:\/\/' + POCHI_DID))) {
-                reply(record.text, record.reply.root, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
-            }
-            else if (!((_d = (_c = record.reply) === null || _c === void 0 ? void 0 : _c.parent) === null || _d === void 0 ? void 0 : _d.uri) && Math.random() <= HIT_RATIO) {
-                reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
-            }
+        if (!op.path.match(/^app.bsky.feed.post/) || op.action !== "create")
+            return;
+        if (!op.cid)
+            return;
+        const recordBlocks = car.blocks.get(op.cid);
+        if (!recordBlocks)
+            return;
+        const record = cborToLexRecord(recordBlocks);
+        if (record.text.match(new RegExp("\@" + POCHI_USERNAME))) {
+            reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
+        }
+        else if (((_b = (_a = record.reply) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.uri) && record.reply.parent.uri.match(new RegExp('^at:\/\/' + POCHI_DID))) {
+            reply(record.text, record.reply.root, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
+        }
+        else if (!((_d = (_c = record.reply) === null || _c === void 0 ? void 0 : _c.parent) === null || _d === void 0 ? void 0 : _d.uri) && Math.random() <= HIT_RATIO) {
+            reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
         }
     });
 }));
@@ -58,9 +58,15 @@ function reply(message, root, parent) {
         const model = 'gpt-4o';
         const messages = [
             { role: "system", content: "You are a dog named ‘ポチ’. You can only speak ‘ワン’, ‘ハッハッ’ and ‘くぅん’." },
-            { role: "system", content: "Other than this, there is no ‘!’ and ‘?’ and other emotional symbols, as well as long sounds, can be used to express emotions." },
+            {
+                role: "system",
+                content: "Other than this, there is no ‘!’ and ‘?’ and other emotional symbols, as well as long sounds, can be used to express emotions."
+            },
             { role: "system", content: "You must understand what your master has told you and react in a dog-like manner." },
-            { role: "system", content: "Expressions of action can be described in Japanese using ‘()’, but it is not always necessary to include this expression." },
+            {
+                role: "system",
+                content: "Expressions of action can be described in Japanese using ‘()’, but it is not always necessary to include this expression."
+            },
             { role: "user", content: message }
         ];
         const response = yield openai.chat.completions.create({ model, messages });

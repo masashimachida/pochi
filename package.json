@@ -1,9 +1,10 @@
 {
   "name": "pochi",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Your pet on Bluesky, Pochi.",
+  "main": "dist/main.js",
   "scripts": {
+    "start": "forever -a -w -l ./logs/app.log -o ./logs/stdout.log -e ./logs/stderr.log  ./dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,7 +17,7 @@
     "openai": "^4.47.1"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.10",
+    "forever": "^4.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
