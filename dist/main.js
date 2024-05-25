@@ -15,10 +15,10 @@ import { BskyAgent } from "@atproto/api";
 dotenv.config();
 const STREAM_ENDPOINT_HOST = process.env.STREAM_ENDPOINT_HOST;
 const MASTER_DID = process.env.MASTER_DID;
-const POCHI_NAME = process.env.POCHI_NAME;
-const POCHI_DID = process.env.POCHI_DID;
-const POCHI_USERNAME = process.env.POCHI_USERNAME;
-const POCHI_PASSWORD = process.env.POCHI_PASSWORD;
+const PET_NAME = process.env.PET_NAME;
+const PET_DID = process.env.PET_DID;
+const PET_USERNAME = process.env.PET_USERNAME;
+const PET_PASSWORD = process.env.PET_PASSWORD;
 const HIT_RATIO = parseFloat(process.env.HIT_RATIO);
 const client = subscribeRepos(STREAM_ENDPOINT_HOST, { decodeRepoOps: true, });
 const openai = new OpenAI({
@@ -43,11 +43,11 @@ client.on('message', (m) => __awaiter(void 0, void 0, void 0, function* () {
         if (!recordBlocks)
             return;
         const record = cborToLexRecord(recordBlocks);
-        if (record.text.match(new RegExp("\@" + POCHI_USERNAME, 'g')) ||
-            record.text.match(new RegExp(POCHI_NAME, 'g'))) {
+        if (record.text.match(new RegExp("\@" + PET_USERNAME, 'g')) ||
+            record.text.match(new RegExp(PET_NAME, 'g'))) {
             reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
         }
-        else if (((_b = (_a = record.reply) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.uri) && record.reply.parent.uri.match(new RegExp('^at:\/\/' + POCHI_DID))) {
+        else if (((_b = (_a = record.reply) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.uri) && record.reply.parent.uri.match(new RegExp('^at:\/\/' + PET_DID))) {
             reply(record.text, record.reply.root, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
         }
         else if (!((_d = (_c = record.reply) === null || _c === void 0 ? void 0 : _c.parent) === null || _d === void 0 ? void 0 : _d.uri) && Math.random() <= HIT_RATIO) {
@@ -59,31 +59,39 @@ function reply(message, root, parent) {
     return __awaiter(this, void 0, void 0, function* () {
         const model = 'gpt-4o';
         const messages = [
-            { role: "system", content: "You are a dog named ‘ポチ’. You can only speak ‘ワン’, ‘ハッハッ’ and ‘くぅん’." },
+            {
+                role: "system",
+                content: "You are a dog named ‘ポチ’. You can only speak ‘ワン’, ‘ハッハッ’ and ‘くぅん’."
+            },
             {
                 role: "system",
                 content: "Other than this, there is no ‘!’ and ‘?’ and other emotional symbols, as well as long sounds, can be used to express emotions."
             },
-            { role: "system", content: "You must understand what your master has told you and react in a dog-like manner." },
+            {
+                role: "system",
+                content: "You must understand what your master has told you and react in a dog-like manner."
+            },
             {
                 role: "system",
                 content: "Expressions of action can be described in Japanese using ‘()’, but it is not always necessary to include this expression."
             },
-            { role: "user", content: message }
+            {
+                role: "user",
+                content: message
+            }
         ];
         const response = yield openai.chat.completions.create({ model, messages });
         const postText = response.choices[0].message.content;
         if (!postText)
             return;
         yield agent.login({
-            identifier: POCHI_USERNAME,
-            password: POCHI_PASSWORD
+            identifier: PET_USERNAME,
+            password: PET_PASSWORD
         });
         yield agent.post({
             text: postText,
             reply: { root, parent },
             createdAt: new Date().toISOString()
         });
-        // console.log(response.choices[0].message.content)
     });
 }
