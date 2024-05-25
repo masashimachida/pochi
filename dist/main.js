@@ -15,6 +15,7 @@ import { BskyAgent } from "@atproto/api";
 dotenv.config();
 const STREAM_ENDPOINT_HOST = process.env.STREAM_ENDPOINT_HOST;
 const MASTER_DID = process.env.MASTER_DID;
+const POCHI_NAME = process.env.POCHI_NAME;
 const POCHI_DID = process.env.POCHI_DID;
 const POCHI_USERNAME = process.env.POCHI_USERNAME;
 const POCHI_PASSWORD = process.env.POCHI_PASSWORD;
@@ -42,7 +43,8 @@ client.on('message', (m) => __awaiter(void 0, void 0, void 0, function* () {
         if (!recordBlocks)
             return;
         const record = cborToLexRecord(recordBlocks);
-        if (record.text.match(new RegExp("\@" + POCHI_USERNAME))) {
+        if (record.text.match(new RegExp("\@" + POCHI_USERNAME, 'g')) ||
+            record.text.match(new RegExp(POCHI_NAME, 'g'))) {
             reply(record.text, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() }, { uri: `at://${m.repo}/${op.path}`, cid: op.cid.toString() });
         }
         else if (((_b = (_a = record.reply) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.uri) && record.reply.parent.uri.match(new RegExp('^at:\/\/' + POCHI_DID))) {
