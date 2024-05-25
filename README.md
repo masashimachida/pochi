@@ -1,5 +1,5 @@
 ## Usage
 
 ```bash
-node ./dist/main.js
+npm start
 ```
